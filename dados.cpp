@@ -1,9 +1,14 @@
 #include <iostream>
 #include <cstdlib>
 #include <ctime>
+#include <cstring>
 #include "dados.h"
-
 using namespace std;
+
+static int maxPuntaje = 0;
+static char nombreMaxPuntaje[30] = "";
+static int minPuntaje = 99999;
+static char nombreMinPuntaje[30] = "";
 
 int tirarDado6() {
     return rand() % 6 + 1;
@@ -27,6 +32,7 @@ void inicializarJugadores(Jugador* j1, Jugador* j2) {
 
 Jugador* decidirInicio(Jugador* j1, Jugador* j2) {
     int dado1, dado2;
+
     do {
         dado1 = tirarDado6();
         dado2 = tirarDado6();
@@ -34,60 +40,55 @@ Jugador* decidirInicio(Jugador* j1, Jugador* j2) {
         cout << j2->nombre << " tira: " << dado2 << endl;
 
         if (dado1 > dado2) {
-            cout << j1->nombre << " comienza la partida." << endl;
+            cout << j1->nombre << " comienza la partida.\n";
             return j1;
         } else if (dado2 > dado1) {
-            cout << j2->nombre << " comienza la partida." << endl;
+            cout << j2->nombre << " comienza la partida.\n";
             return j2;
         } else {
-            cout << "Empate. Se repite la tirada." << endl;
+            cout << "Empate. Se repite la tirada.\n";
         }
-    } while (dado1 == dado2);
-
-    return nullptr;
+    } while (true);
 }
 
 void mostrarMenu() {
-    cout << "\n----- MENU PRINCIPAL -----\n";
+    cout << "\n----- MENÚ PRINCIPAL -----\n";
     cout << "1 - JUGAR\n";
-    cout << "2 - ESTADISTICAS\n";
-    cout << "3 - CREDITOS\n";
+    cout << "2 - ESTADÍSTICAS\n";
+    cout << "3 - CRÉDITOS\n";
     cout << "0 - SALIR\n";
     cout << "--------------------------\n";
-    cout << "Seleccione una opcion: ";
+    cout << "Seleccione una opción: ";
 }
 
 void mostrarCreditos() {
-    cout << "\nJuego inventado por Angel Simón.\n";
-    cout << "Integrantes del grupo:\n";
+    cout << "\nTrabajo práctico realizado por:\n";
     cout << "- Soraya Zaragoza (30656)\n";
     cout << "- Rodrigo Garcia Dieguez (32655)\n";
-    cout << "Grupo: Mapache Team\n";
+    cout << "Equipo: Mapache Team\n";
+    cout << "Docente: Ángel Simón\n";
 }
 
-void mostrarEstadisticas(Jugador* j1, Jugador* j2) {
-    cout << "\n===== ESTADISTICAS =====\n";
-    if (j1->puntos > j2->puntos) {
-        cout << "Ganador: " << j1->nombre << " con " << j1->puntos << " puntos.\n";
-        cout << "Perdedor: " << j2->nombre << " con " << j2->puntos << " puntos.\n";
-    } else if (j2->puntos > j1->puntos) {
-        cout << "Ganador: " << j2->nombre << " con " << j2->puntos << " puntos.\n";
-        cout << "Perdedor: " << j1->nombre << " con " << j1->puntos << " puntos.\n";
+void mostrarEstadisticas() {
+    cout << "\n--- ESTADÍSTICAS ---\n";
+    if (strlen(nombreMaxPuntaje) > 0) {
+        cout << "Mayor puntaje registrado: " << nombreMaxPuntaje << " con " << maxPuntaje << " puntos.\n";
+        cout << "Menor puntaje registrado: " << nombreMinPuntaje << " con " << minPuntaje << " puntos.\n";
     } else {
-        cout << "Empate entre ambos jugadores con " << j1->puntos << " puntos.\n";
+        cout << "Aún no se ha registrado ninguna partida.\n";
     }
 }
 
 void mostrarDadosConIndices(int dados[], int cantidad) {
-    cout << "Dados:     ";
+    cout << "\nDados:     ";
     for (int i = 0; i < cantidad; i++) {
         cout << "[" << dados[i] << "] ";
     }
-    cout << "\nIndices:   ";
+    cout << "\nÍndices:   ";
     for (int i = 0; i < cantidad; i++) {
-        cout << " " << i + 1 << "  ";
+        cout << " " << (i + 1) << "   ";
     }
-    cout << endl;
+    cout << "\n";
 }
 
 void jugarTurno(Jugador* jugadorActual, Jugador* rival) {
@@ -96,7 +97,7 @@ void jugarTurno(Jugador* jugadorActual, Jugador* rival) {
     int dadoObj1 = tirarDado12();
     int dadoObj2 = tirarDado12();
     int numeroObjetivo = dadoObj1 + dadoObj2;
-    cout << "Dados objetivo: " << dadoObj1 << " + " << dadoObj2 << " = " << numeroObjetivo << " (Numero objetivo)\n";
+    cout << "Dados objetivo: " << dadoObj1 << " + " << dadoObj2 << " = " << numeroObjetivo << endl;
 
     for (int i = 0; i < jugadorActual->cantidadDados; i++) {
         jugadorActual->dados[i] = tirarDado6();
@@ -105,15 +106,20 @@ void jugarTurno(Jugador* jugadorActual, Jugador* rival) {
     mostrarDadosConIndices(jugadorActual->dados, jugadorActual->cantidadDados);
 
     int suma = 0;
-    int elegidos[20] = {0};
+    int elegidos[20];
     int usados[20] = {0};
     int cantidadElegidos = 0;
 
-    cout << "\nIngrese el número de índice del dado (0 para rendirse):\n";
+    cout << "\nSelecciona los dados uno por uno (ingrese el índice). Ingrese 0 para rendirse:\n";
 
-    while (suma < numeroObjetivo && cantidadElegidos < jugadorActual->cantidadDados) {
+    while (true) {
+        if (cantidadElegidos >= jugadorActual->cantidadDados) {
+            cout << "Ya usaste todos tus dados disponibles.\n";
+            break;
+        }
+
         int seleccion;
-        cout << "# " << cantidadElegidos + 1 << ": ";
+        cout << "Selección #" << (cantidadElegidos + 1) << ": ";
         cin >> seleccion;
 
         if (seleccion == 0) {
@@ -139,7 +145,7 @@ void jugarTurno(Jugador* jugadorActual, Jugador* rival) {
             cout << "\n¡Tirada exitosa!\n";
             cout << "Ganaste " << puntosGanados << " puntos.\n";
 
-            for (int i = 0; i < cantidadElegidos && jugadorActual->cantidadDados > 0; i++) {
+            for (int i = 0; i < cantidadElegidos; i++) {
                 if (rival->cantidadDados < 20) {
                     rival->dados[rival->cantidadDados++] = jugadorActual->dados[elegidos[i]];
                 }
@@ -148,26 +154,76 @@ void jugarTurno(Jugador* jugadorActual, Jugador* rival) {
             jugadorActual->cantidadDados -= cantidadElegidos;
 
             if (jugadorActual->cantidadDados == 0) {
-                cout << jugadorActual->nombre << " se quedo sin dados. ¡Gana automaticamente con 10000 puntos extra!\n";
+                cout << jugadorActual->nombre << " se quedó sin dados. ¡Gana automáticamente con 10000 puntos extra!\n";
                 jugadorActual->puntos += 10000;
             }
-
             break;
-        }
-
-        if (suma > numeroObjetivo) {
+        } else if (suma > numeroObjetivo) {
             cout << "La suma superó el objetivo. Tirada fallida.\n";
             break;
         }
     }
 
     if (suma != numeroObjetivo && rival->cantidadDados > 1) {
-        jugadorActual->dados[jugadorActual->cantidadDados++] = rival->dados[--rival->cantidadDados];
+        jugadorActual->dados[jugadorActual->cantidadDados++] = rival->dados[rival->cantidadDados - 1];
+        rival->cantidadDados--;
         cout << jugadorActual->nombre << " recibe 1 dado de " << rival->nombre << " por tirada fallida.\n";
     }
 
-    cout << "Puntaje actual: " << jugadorActual->nombre << ": " << jugadorActual->puntos << " | ";
-    cout << rival->nombre << ": " << rival->puntos << endl;
-    cout << "Dados restantes: " << jugadorActual->nombre << ": " << jugadorActual->cantidadDados << " | ";
-    cout << rival->nombre << ": " << rival->cantidadDados << endl;
+    cout << "Puntaje actual: " << jugadorActual->nombre << ": " << jugadorActual->puntos
+         << " | " << rival->nombre << ": " << rival->puntos << endl;
+    cout << "Dados restantes: " << jugadorActual->nombre << ": " << jugadorActual->cantidadDados
+         << " | " << rival->nombre << ": " << rival->cantidadDados << endl;
+}
+
+void jugarPartida() {
+    Jugador jugador1, jugador2;
+
+    cout << "\n=== Iniciando el juego Enfrentados ===\n";
+
+    inicializarJugadores(&jugador1, &jugador2);
+    Jugador* quienEmpieza = decidirInicio(&jugador1, &jugador2);
+    Jugador* otro = (quienEmpieza == &jugador1) ? &jugador2 : &jugador1;
+
+    cout << "\nComienza la partida real!\n";
+
+    for (int ronda = 1; ronda <= 3; ronda++) {
+        cout << "\n==== RONDA " << ronda << " ====\n";
+
+        jugarTurno(quienEmpieza, otro);
+        if (quienEmpieza->cantidadDados == 0) break;
+
+        jugarTurno(otro, quienEmpieza);
+        if (otro->cantidadDados == 0) break;
+    }
+
+    cout << "\n==== FIN DEL JUEGO ====\n";
+    cout << jugador1.nombre << ": " << jugador1.puntos << " puntos\n";
+    cout << jugador2.nombre << ": " << jugador2.puntos << " puntos\n";
+
+    if (jugador1.puntos > jugador2.puntos) {
+        cout << "Ganó " << jugador1.nombre << "!\n";
+    } else if (jugador2.puntos > jugador1.puntos) {
+        cout << "Ganó " << jugador2.nombre << "!\n";
+    } else {
+        cout << "Empate!\n";
+    }
+
+    if (jugador1.puntos > maxPuntaje) {
+        maxPuntaje = jugador1.puntos;
+        strcpy(nombreMaxPuntaje, jugador1.nombre);
+    }
+    if (jugador2.puntos > maxPuntaje) {
+        maxPuntaje = jugador2.puntos;
+        strcpy(nombreMaxPuntaje, jugador2.nombre);
+    }
+
+    if (jugador1.puntos < minPuntaje) {
+        minPuntaje = jugador1.puntos;
+        strcpy(nombreMinPuntaje, jugador1.nombre);
+    }
+    if (jugador2.puntos < minPuntaje) {
+        minPuntaje = jugador2.puntos;
+        strcpy(nombreMinPuntaje, jugador2.nombre);
+    }
 }

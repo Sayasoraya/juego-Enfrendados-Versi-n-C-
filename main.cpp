@@ -1,8 +1,11 @@
 #include <iostream>
-#include "dados.h"  // Incluye las funciones y estructuras definidas en dados.h
+#include <ctime>
+#include "dados.h"
 using namespace std;
 
 int main() {
+    system("chcp 65001 > nul"); // Fuerza codificación UTF-8 en consola
+
     int opcion;
     char confirmar;
 
@@ -18,6 +21,7 @@ int main() {
                 jugarPartida();
                 break;
             case 2:
+                // Nota: necesitas pasar los jugadores si tu función lo requiere
                 mostrarEstadisticas();
                 break;
             case 3:
