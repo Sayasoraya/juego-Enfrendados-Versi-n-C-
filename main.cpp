@@ -1,16 +1,16 @@
 #include <iostream>
 #include <ctime>
 #include "dados.h"
+
 using namespace std;
 
 int main() {
-    system("chcp 65001 > nul"); // Fuerza codificación UTF-8 en consola
-
     int opcion;
     char confirmar;
 
-    // Semilla para aleatoriedad
-    srand(time(NULL));
+    srand(time(NULL)); // Semilla para numeros aleatorios
+
+    Jugador jugador1, jugador2;
 
     do {
         mostrarMenu();
@@ -18,30 +18,28 @@ int main() {
 
         switch (opcion) {
             case 1:
-                jugarPartida();
+                jugarPartida(jugador1, jugador2);
                 break;
             case 2:
-                // Nota: necesitas pasar los jugadores si tu función lo requiere
-                mostrarEstadisticas();
+                mostrarEstadisticas(jugador1, jugador2);
                 break;
             case 3:
                 mostrarCreditos();
                 break;
             case 0:
-                cout << "\n¿Estás segura/o de que querés salir? (s/n): ";
+                cout << "\nEstas segura/o de que queres salir? (s/n): ";
                 cin >> confirmar;
                 if (confirmar == 's' || confirmar == 'S') {
-                    cout << "Saliendo del programa... Hasta luego.\n";
+                    cout << "Saliendo del programa... Hasta luego." << endl;
                     return 0;
                 }
                 break;
             default:
-                cout << "Opción no válida. Intente nuevamente.\n";
+                cout << "Opcion no valida. Intenta nuevamente." << endl;
         }
 
         system("pause");
         system("cls");
-
     } while (true);
 
     return 0;
